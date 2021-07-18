@@ -1,50 +1,39 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public sealed class RoadSpawner : MonoBehaviour
+public  class RoadSpawner : MonoBehaviour
 {
-    private static RoadSpawner singleton = null;
     public List<GameObject> _pool = new List<GameObject>();
     public GameObject _roadObj;
     public int _roadCount;
     private Vector3 randDir;
-    public Transform creator;
 
-    public static RoadSpawner GetSingleton()
+    private void Start()
     {
-        if (singleton == null)
-        {
-            singleton = new GameObject("RoadCreator").AddComponent<RoadSpawner>();
-        }
-        return singleton;
+        Initialize(_roadCount);
     }
 
-    void Initialize(int count, GameObject roadPref)
+    public void Initialize(int count)
     {
-        _roadObj = roadPref;
         _roadCount = count;
         InstantiateBlock();
     }
 
-    void InstantiateBlock()
+    //Creates new road object at random given directions.
+    public void InstantiateBlock()
     {
-        for (int i = 0; i < _roadCount; i++)
+        for (var i = 0; i < _roadCount; i++)
         {
             if (Random.Range(0, 2) == 0)
-            {
                 randDir = Vector3.forward;
-            }
             else
-            {
                 randDir = Vector3.left;
-            }
-            
-            _roadObj = Instantiate(_roadObj, _roadObj.transform.position + randDir, _roadObj.transform.rotation, creator);
+
+            _roadObj = Instantiate(_roadObj, _roadObj.transform.position + randDir, _roadObj.transform.rotation,
+                transform);
             _pool.Add(_roadObj);
         }
     }
-    
 }

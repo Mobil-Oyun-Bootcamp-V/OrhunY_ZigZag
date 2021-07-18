@@ -1,44 +1,34 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+//This script contains functions that makes Ball move accordingly.
 public class BallController : MonoBehaviour
 {
     [SerializeField] private Rigidbody _rb;
+    [SerializeField] private GameManager _gameManager;
     public float _speed;
+    public RoadSpawner _rs;
     private Vector3 _direction;
-    public enum BallState{Wait, Moving, Falling}
-    public static BallState _state;
+
     
-
-    private void FixedUpdate()
+    //Initializes new random road objects every time player crosses one and increases the score count by one.
+    private void OnCollisionExit(Collision other)
     {
-        switch (_state)
+        if (other.collider.CompareTag("Ground"))
         {
-            case BallState.Moving:
-                MoveBall();
-                if(transform.position.y < .24f){_state = BallState.Falling;}
-                    break;
-            
-            case BallState.Falling:
-
-                break;
-            
-            case BallState.Wait:
-                if (Input.touchCount > 0) { _state = BallState.Moving; }
-                break;
+            _gameManager.AddScore();
+            _rs.Initialize(10);
         }
-
     }
 
-    void MoveBall()
+    //This function gives a constant velocity on FixedUpdate and calls Change direction function on every single tap.
+    public void MoveBall()
     {
         if (Input.touchCount > 0)
         {
-            Touch touch = Input.GetTouch(0);
-            
-            if(touch.phase == TouchPhase.Ended){ChangeDirection();}
+            var touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Ended) ChangeDirection();
         }
 
         _rb.velocity = _direction * (Time.fixedDeltaTime * _speed);
@@ -55,14 +45,6 @@ public class BallController : MonoBehaviour
         {
             _direction = Vector3.forward;
             Debug.Log("forward");
-        }
-    }
-
-    private void OnCollisionExit(Collision other)
-    {
-        if (other.collider.CompareTag("Ground"))
-        {
-            //StartCoroutine(other.transform.parent.GetComponent<RoadSpawner>().CallBack(other.transform.gameObject));
         }
     }
 }
